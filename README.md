@@ -93,21 +93,6 @@ The agent is built as a structured conversation flow with 32 nodes, covering two
 
 ### 🎙️ Retell AI — Voice Agent (Chelsea / Rita)
 
-| Setting | Value |
-|---|---|
-| Agent Name | Houston Medical Center Receptionist |
-| Voice | `retell-Rita` |
-| Version Title | `Rita-HMC-V0` |
-| Language | `en-US` (Spanish transfer via agent swap node) |
-| LLM Model | GPT-5.1 (cascading) |
-| Post-call Analysis | GPT-4.5-nano |
-| Voice Speed | 1.2x |
-| Interruption Sensitivity | 0.95 (highly responsive) |
-| Dynamic Responsiveness | Enabled |
-| Denoising | Noise cancellation |
-| Max Call Duration | 60 minutes |
-| Response Engine | Conversation Flow (32 nodes) |
-
 **Tools registered on the agent (7 total):**
 
 | Tool | Type | Description |
@@ -134,51 +119,11 @@ The agent is built as a structured conversation flow with 32 nodes, covering two
 
 The scenario uses a **webhook trigger** (`Retell_Conversational_Voice`) and routes each incoming tool call to the correct OpenEMR API operation via a `BasicRouter`. Each route is **filter-gated by `tool_call_name`**, so a single webhook endpoint handles all 7 agent tools.
 
-**Route map:**
-
-| Filter | HTTP Method | OpenEMR Endpoint | Purpose |
-|---|---|---|---|
-| `create_patient` | POST | `/apis/default/api/patient` | Create new patient record |
-| `GET-Patient-Information` | GET | `/apis/default/api/patient?phone_cell={{phone}}` | Look up patient by phone |
-| `POST--appointments-create` | POST | `/apis/default/api/patient/{{patient_id}}/appointment` | Book appointment |
-| `GET-available-appointment` | GET | `/apis/default/api/appointment?pc_aid=5` | Fetch available slots |
-| `check_specific_slot` | GET | `/apis/default/api/appointment?pc_aid=5` | Validate specific slot |
-
-**Payload sent to OpenEMR on patient creation:**
-```json
-{
-  "fname": "{{first_name}}",
-  "lname": "{{last_name}}",
-  "DOB": "{{formatDate(dob, 'YYYY-MM-DD')}}",
-  "phone_cell": "{{phone}}",
-  "sex": "{{sex}}"
-}
-```
-
-**Appointment booking payload:**
-```json
-{
-  "pc_aid": "5",
-  "pc_facility": 3,
-  "pc_catid": 5,
-  "pc_eventDate": "{{formatDate(slot_datetime, 'YYYY-MM-DD')}}",
-  "pc_startTime": "{{formatDate(slot_datetime, 'HH:mm')}}"
-}
-```
-
 **Error handling:** Each route has a secondary `BasicRouter` that branches on success or failure, returning a structured webhook response to Chelsea in both cases — so the agent always gets a meaningful reply to continue the conversation.
 
 Authentication to OpenEMR uses **OAuth 2.0** via Make's native credential manager.
 
----
-
-### 🏥 OpenEMR — Electronic Medical Records
-
-- **Instance:** `demo.dafiniti-emr.com` (Houston Medical Center deployment)
-- **Auth:** OAuth 2.0 — token managed via Make.com connection
-- **APIs used:** Patient CRUD, Appointment availability, Appointment creation
-- **Provider:** Dr. Smith Davis (`pc_aid: 5`, `pc_facility: 3`)
-- Open-source EMR — no vendor lock-in, REST API documented and extensible
+<img width="521" height="389" alt="image" src="https://github.com/user-attachments/assets/acd8872c-b83a-4305-934f-72bcbab8f76c" />
 
 ---
 
@@ -231,29 +176,6 @@ clinia/
 └── README.md
 ```
 
----
-
-## Setup / Replication
-
-> ⚠️ This project integrates with external services. You will need active accounts on Retell AI and Make.com, and a running OpenEMR instance.
-
-### Prerequisites
-- Retell AI account — import the agent blueprint
-- Make.com account — import the scenario blueprint
-- OpenEMR instance (self-hosted or demo)
-
-### Steps
-1. Import `make/Houston_Medical_Center_Flow_blueprint.json` into Make.com
-2. Update the `Retell_Conversational_Voice` webhook URL in Retell's tool settings
-3. Configure OpenEMR OAuth credentials in Make.com's connection manager
-4. Import `retell/Houston_Medical_Center_Receptionist.json` into Retell AI
-5. Publish the agent and assign a phone number
-
----
-
-## About
-
-Clinia was built to explore how AI can reduce friction at the point of entry into the healthcare system — making care more accessible for patients and more manageable for the clinics serving them.
 
 This project reflects hands-on experience integrating production AI voice systems with real healthcare infrastructure, building automation pipelines that handle sensitive patient data reliably, and navigating the operational constraints of clinical environments.
 
