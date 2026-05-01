@@ -3,6 +3,8 @@
 > **AI-powered medical receptionist** — automating patient registration, appointment scheduling, and EMR record management through a real-time conversational voice agent.
 
 > 🎥 [Watch a live demo call](https://www.loom.com/share/a704e5e129f2442a97f2faa17c019b7d)
+> 
+> Calculate your ROI with this Calculator: https://dafinity-roi-calculator.netlify.app/
 
 ---
 
